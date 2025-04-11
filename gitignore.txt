@@ -1,0 +1,71 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter and IPython
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# VSCode / IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / dependencies
+.env
+.venv/
+venv/
+env/
+Pipfile.lock
+poetry.lock
+
+# Virtual environment and config files
+*.egg-info/
+*.log
+
+# FAISS and model files
+*.faiss
+*.h5
+*.pt
+*.ckpt
+*.bin
+*.onnx
+*.pkl
+
+# LLM API keys or secrets (make sure not to upload these!)
+openai_api_key.txt
+credentials.json
+
+# Data files
+data/
+datasets/
+*.csv
+*.tsv
+*.json
+*.xlsx
+*.zip
+*.tar.gz
+
+# Output files and cache
+*.out
+*.pdf
+*.html
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+__results__/
+outputs/
+logs/
+checkpoints/
+.cache/
+.temp/
+
+# Streamlit stuff
+.streamlit/secrets.toml
