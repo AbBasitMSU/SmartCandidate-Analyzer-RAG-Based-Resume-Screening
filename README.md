@@ -50,7 +50,8 @@ Source job description dataset: [Kaggle](https://www.kaggle.com/datasets/kshitiz
 
 ### 1. Chatbot Structure
 
-![chatbot_structure](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline/assets/46376260/dc97c06c-ca5d-4882-8e78-9101d528ee75)
+![chatbot_structure]![IMG_9305](https://github.com/user-attachments/assets/7538f6f1-9ae3-46bc-a3b8-0447229e7c7f)
+
 
 The deployed chatbot utilizes certain techniques to be more suitable for real-world use cases:
 
@@ -65,7 +66,7 @@ The deployed chatbot utilizes certain techniques to be more suitable for real-wo
 
 ### 2. Under-the-hood RAG Pipeline 
 
-![Encoder (1)](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline/assets/46376260/4259837e-9e2c-40f8-8276-e9469667b98b)
+![Encoder (1)]![IMG_0330](https://github.com/user-attachments/assets/d62c08e9-4f88-43a0-9baa-b0865af41328)
 
 The pipeline begins by processing resumes into a vector storage. Upon receiving the input job descriptions query, the LLM agent is prompted to generate sub-queries. The vector storage then performs a retrieval process for each given query to return the top-K most similar documents. The document list for each sub-query is then combined and re-ranked into a new list, representing the most similar documents to the original job description. The LLM then utilizes the retrieved applicants' information as context to form accurate, relevant, and informative responses to assist hiring managers in matching resumes with job descriptions.
 
@@ -74,7 +75,7 @@ The pipeline begins by processing resumes into a vector storage. Upon receiving 
 To set up the project locally:
 ```
 # Clone the project
-git clone https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline.git
+git clone (https://github.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening)
 
 # Install dependencies
 pip install requirements.txt
@@ -87,7 +88,7 @@ streamlit run demo/interface.py
 
 ## Contributions
 
-The design of the demo chatbot is relatively simple because it only serves to show the bigger picture of the potential of RAG-like systems in the recruitment domain. As such, the system is still very much a work in progress and any suggestion, feedback, or contribution is highly appreciated! Please share them at [Issue](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline/issues). 
+The design of the demo chatbot is relatively simple because it only serves to show the bigger picture of the potential of RAG-like systems in the recruitment domain. As such, the system is still very much a work in progress and any suggestion, feedback, or contribution is highly appreciated! 
 
 ## Acknowledgement
 
