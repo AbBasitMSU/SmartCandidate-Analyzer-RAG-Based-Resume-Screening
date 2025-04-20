@@ -182,13 +182,13 @@ with st.sidebar:
 
         #### Getting started 🛠️
 
-        1. To set up, please add your OpenAI's API key. 🔑 
-        2. Type in a job description query. 💬
+        1. To set up, please add your OpenAI's API key. 
+        2. Type in a job description query. 
 
         Hint: The knowledge base of the LLM has been loaded with a pre-existing vectorstore of [resumes](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline/blob/main/data/main-data/synthetic-resumes.csv) to be used right away. 
         In addition, you may also find example job descriptions to test [here](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline/blob/main/data/supplementary-data/job_title_des.csv).
 
-        Please make sure to check the sidebar for more useful information. 💡
+        Please make sure to check the sidebar for more useful information. 
         """
 
         info_message = """
@@ -199,7 +199,7 @@ with st.sidebar:
         If you want to load in your own resumes file, simply use the uploading button above. 
         Please make sure to have the following column names: `Resume` and `ID`. 
 
-        Keep in mind that the indexing process can take **quite some time** to complete. ⌛
+        Keep in mind that the indexing process can take **quite some time** to complete. 
 
         ### 2. What if I want to set my own parameters?
 
@@ -231,7 +231,7 @@ with st.sidebar:
 
         The program is very much a work in progress. I really appreciate any contribution or feedback on [GitHub](https://github.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening).
 
-        If you are interested, please don't hesitate to give me a star. ⭐
+        If you are interested, please don't hesitate to give me a star. 
         """
         """
     )
