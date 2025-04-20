@@ -1,3 +1,4 @@
+import torch.nn as nn
 # >>> PATCH: work around a Bug in sentence‑transformers .to(device) <<<  
 import sentence_transformers  
 # override the `to` method so it becomes a no‑op  
@@ -132,15 +133,26 @@ if "vectordb" not in st.session_state:
 # ─── LLM CACHING ───────────────────────────────────────────────────────────────
 @st.cache_resource
 def get_llm(model_name: str):
+    # == Monkey-patch to avoid .to(device) errors ==
+    orig_to = nn.Module.to
+    nn.Module.to = lambda self, *args, **kwargs: self
+
+    # Build your HF pipeline on CPU (device=-1)
     gen = pipeline(
         "text-generation",
         model=model_name,
         max_new_tokens=MAX_NEW_TOKENS,
         truncation=True,
-        pad_token_id=None,  # set below
+        pad_token_id=None,        # we’ll set it below
         temperature=TEMPERATURE,
+        device=-1,                # -1 forces CPU
     )
+    # ensure pad token is EOS
     gen.tokenizer.pad_token_id = gen.tokenizer.eos_token_id
+
+    # Restore the original to() so we don’t break anything else
+    nn.Module.to = orig_to
+
     return HuggingFacePipeline(pipeline=gen)
 
 # instantiate with default or sidebar choice
