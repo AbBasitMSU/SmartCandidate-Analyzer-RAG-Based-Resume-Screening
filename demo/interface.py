@@ -41,7 +41,8 @@ mode         = st.sidebar.radio("🔍 Retrieval Mode", ["Generic RAG","Fusion RA
 model_choice = st.sidebar.selectbox("🤖 Answer Model", GEN_MODELS, index=GEN_MODELS.index(DEFAULT_GEN))
 uploaded_pdf = st.sidebar.file_uploader("📄 Upload your resume (PDF/TXT)", type=["pdf","txt"])
 st.sidebar.markdown("---")
-st.sidebar.markdown("""
+st.sidebar.markdown(
+"""
 welcome_message = """
   #### Introduction 🚀
 
