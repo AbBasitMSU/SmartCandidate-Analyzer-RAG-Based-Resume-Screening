@@ -3,7 +3,7 @@ sys.dont_write_bytecode = True
 
 import time
 from dotenv import load_dotenv
-
+import torch
 import pandas as pd
 import streamlit as st
 
@@ -102,7 +102,7 @@ if "df" not in st.session_state:
 if "embedding_model" not in st.session_state:
     st.session_state.embedding_model = HuggingFaceEmbeddings(
         model_name=EMBEDDING_MODEL,
-        model_kwargs={"device": "cpu"},
+        model_kwargs={"device": torch.device("cpu")},
     )
 
 if "vectordb" not in st.session_state:
