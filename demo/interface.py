@@ -10,7 +10,7 @@ from transformers import pipeline
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 
-# ─── CONFIG ───────────────────────────────────────────────────────────────────
+# ─── CONFIG ────────────────────────────────────────────────────────────────────
 DATA_CSV       = "data/main-data/synthetic-resumes.csv"
 EMBED_MODEL    = "all-MiniLM-L6-v2"
 GEN_MODELS     = ["distilgpt2", "gpt2-medium", "google/flan-t5-large"]
@@ -18,25 +18,19 @@ DEFAULT_GEN    = "google/flan-t5-large"
 TOP_K          = 5
 MAX_NEW_TOKENS = 150
 TEMPERATURE    = 0.3
-SIM_THRESHOLD  = 0.2  # minimum cosine similarity to accept
+SIM_THRESHOLD  = 0.2
 
-# ─── PAGE THEME & CSS ─────────────────────────────────────────────────────────
+# ─── THEME & CSS ───────────────────────────────────────────────────────────────
 st.set_page_config(page_title="SmartCandidate Analyzer", layout="wide")
-st.markdown(
-    """
+st.markdown("""
     <style>
-      /* center header */
       .main-title { text-align: center; font-size: 2.5rem; margin: 0; }
-      .sub-title  { text-align: center; color: #555; margin-top: 0.2rem; margin-bottom: 1rem; }
-      /* buttons & cards */
-      .stButton>button { border-radius: 8px; padding: 0.6em 1.2em; }
-      .stMetric > div { background: #ffffffcc; border-radius: 10px; }
-      /* page padding */
-      .css-1d391kg { padding: 1rem 2rem; }
+      .sub-title  { text-align: center; color: #555; margin-top:0.2rem; margin-bottom:1rem; }
+      .stButton>button { border-radius:8px; padding:0.6em 1.2em; }
+      .stMetric > div { background:#ffffffcc; border-radius:10px; }
+      .css-1d391kg { padding:1rem 2rem; }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
 logo_path = "assets/logo.png"
@@ -46,24 +40,29 @@ else:
     st.markdown("<h1 class='main-title'>📄</h1>", unsafe_allow_html=True)
 
 st.markdown("<h1 class='main-title'>SmartCandidate Analyzer</h1>", unsafe_allow_html=True)
-st.markdown(
-    "<p class='sub-title'>RAG‑powered resume screening, now with a shiny new UI!</p>",
-    unsafe_allow_html=True
-)
+st.markdown("<p class='sub-title'>RAG‑powered resume screening, now with a shiny new UI!</p>",
+            unsafe_allow_html=True)
 
-# ─── SIDEBAR ───────────────────────────────────────────────────────────────────
-st.sidebar.header("Settings")
+# ─── SIDEBAR CONTROLS & DOCS ───────────────────────────────────────────────────
 mode         = st.sidebar.radio("🔍 Retrieval Mode", ["Generic RAG", "Fusion RAG"])
 model_choice = st.sidebar.selectbox("🤖 Answer Model", GEN_MODELS, index=GEN_MODELS.index(DEFAULT_GEN))
-uploaded_pdf = st.sidebar.file_uploader("📄 Upload your resume (PDF/TXT)", type=["pdf","txt"])
+uploaded_pdf = st.sidebar.file_uploader("📄 Upload your resume (PDF/TXT)", type=["pdf", "txt"])
 
 st.sidebar.markdown("---")
-st.sidebar.header("Navigation")
-nav = st.sidebar.radio("", ["Run", "Book Interview", "Documentation"])
+st.sidebar.header("Documentation")
+st.sidebar.markdown("""
+**SmartCandidate Analyzer** is a RAG‑powered resume screening demo.
+
+- **Embedder**: all‑MiniLM‑L6‑v2  
+- **Retriever**: FAISS (cosine)  
+- **Generator**: Local HF models (e.g. flan‑t5‑large)  
+
+Enter a JD in **Run**, then optionally **Book Interview** for your top candidates.
+""")
 st.sidebar.markdown("---")
 st.sidebar.markdown("Built by [AbBasitMSU](https://github.com/AbBasitMSU)")
 
-# ─── CACHED LOADERS ───────────────────────────────────────────────────────────
+# ─── CACHED LOADERS ─────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_data(path):
     df = pd.read_csv(path)
@@ -91,11 +90,11 @@ def get_generator(model_name):
     return gen
 
 # ─── HELPERS ───────────────────────────────────────────────────────────────────
-def extract_text(file) -> str:
-    if file.type == "application/pdf":
-        reader = PdfReader(io.BytesIO(file.read()))
+def extract_text(f) -> str:
+    if f.type == "application/pdf":
+        reader = PdfReader(io.BytesIO(f.read()))
         return "\n\n".join(page.extract_text() or "" for page in reader.pages)
-    return file.read().decode("utf-8")
+    return f.read().decode("utf-8")
 
 def compute_match_score(jd, resume, emb):
     vecs = emb.encode([jd, resume], convert_to_numpy=True)
@@ -108,7 +107,7 @@ def retrieve_results(jd, mode, emb, idx):
     if mode == "Generic RAG":
         sc, ids = idx.search(qv, TOP_K)
         return list(zip(ids[0].tolist(), sc[0].tolist()))
-    # Fusion: split into chunks and fuse
+    # Fusion RAG
     parts = [jd] + jd.split('.')[:4]
     agg = {}
     for chunk in parts:
@@ -135,12 +134,14 @@ Recommendation:"""
     out = gen(prompt)[0]["generated_text"]
     return out.replace(prompt, "").strip()
 
-# ─── LOAD DATA & GENERATOR ─────────────────────────────────────────────────────
+# ─── LOAD & PREPARE ───────────────────────────────────────────────────────────
 df, embedder, idx = load_data(DATA_CSV)
 generator = get_generator(model_choice)
 
-# ─── RENDER PAGES ─────────────────────────────────────────────────────────────
-if nav == "Run":
+# ─── RUN & BOOK INTERVIEW TABS ─────────────────────────────────────────────────
+tab_run, tab_book = st.tabs(["🚀 Run", "📅 Book Interview"])
+
+with tab_run:
     st.subheader("📝 Job Description")
     jd = st.text_area("", height=120)
 
@@ -150,12 +151,13 @@ if nav == "Run":
         st.subheader("📑 Your Resume Preview")
         st.write(user_text[:200] + "…")
 
-    if st.button("🚀 Run"):
+    if st.button("Run"):
+        # sanity check
         if len(jd.split()) < 5:
             st.error("Please enter a more detailed job description (≥ 5 words).")
             st.stop()
 
-        # display metrics
+        # show metrics
         col1, col2, col3 = st.columns(3)
         if user_text:
             score = compute_match_score(jd, user_text, embedder)
@@ -168,47 +170,33 @@ if nav == "Run":
             st.warning("No relevant resumes found for that job description.")
             st.stop()
 
-        # store for booking
+        # save for booking
         st.session_state.last_results = results
         st.session_state.last_jd = jd
 
-        # show ranking + recommendation
         st.subheader("🔍 Top Existing Resumes")
         for rank, (i, sc) in enumerate(results, start=1):
-            st.markdown(f"**{rank}. Applicant ID {df.iloc[i]['ID']}** — Score {sc:.3f}")
+            st.markdown(f"**{rank}. Applicant ID {df.iloc[i]['ID']}** — Score {sc:.3f}")
             st.write(df.iloc[i]["Resume"][:200] + "…")
 
         rec = generate_recommendation(jd, [i for i,_ in results], df, generator)
         st.subheader("🤖 Recommendation")
         st.write(rec)
 
-elif nav == "Book Interview":
+with tab_book:
     st.subheader("📅 Book Interview")
     if "last_results" not in st.session_state:
-        st.info("Run a job description first to select candidates.")
+        st.info("Run a JD first to load candidates.")
     else:
-        ids = [i for i,_ in st.session_state.last_results]
-        candidates = [f"Applicant ID {df.iloc[i]['ID']}" for i in ids]
+        cand_ids = [i for i,_ in st.session_state.last_results]
+        candidates = [f"Applicant ID {df.iloc[i]['ID']}" for i in cand_ids]
         selected = st.multiselect("Select candidates", candidates)
         interview_date = st.date_input("Interview Date", value=datetime.today())
         interview_time = st.time_input("Interview Time", value=datetime.now().time())
         email_body = st.text_area(
             "Email Body",
-            value=f"Dear Candidate,\n\nWe are pleased to invite you for an interview on {interview_date} at {interview_time}.\n\nBest regards,"
+            value=f"Dear Candidate,\n\nWe would like to invite you for an interview on {interview_date} at {interview_time}.\n\nBest regards,"
         )
         if st.button("Send Invitations"):
             for cand in selected:
                 st.success(f"Invitation sent to {cand} for {interview_date} at {interview_time}.")
-
-else:  # Documentation
-    st.header("📄 Documentation")
-    st.markdown("""
-    **SmartCandidate Analyzer** is a Retrieval‑Augmented Generation tool for resume screening.
-    
-    - **Author**: AbBasitMSU  
-    - **Embeddings**: `sentence-transformers/all-MiniLM-L6-v2`  
-    - **Retriever**: FAISS (IP)  
-    - **Generator**: Local HF models (e.g. `flan-t5-large`)  
-
-    Full detailed documentation will be added here soon.
-    """)
