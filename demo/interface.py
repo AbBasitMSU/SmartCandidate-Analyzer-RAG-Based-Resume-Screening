@@ -141,13 +141,163 @@ if help_option == "Instructions":
 elif help_option == "Documentation":
     st.header("📄 Documentation")
     st.markdown("""
-**SmartCandidate Analyzer** is a Retrieval‑Augmented Generation demo for resume screening.
+Below is a rich, detailed Documentation write‑up you can paste straight into your sidebar or Documentation panel. It’s organized into clear sections and covers everything from high‑level concepts through implementation details, dependencies, and next steps.
 
-- **Embeddings**: sentence-transformers/all‑MiniLM‑L6‑v2  
-- **Retriever**: FAISS (Inner Product)  
-- **Generator**: Local HF models (e.g. google/flan‑t5‑large)  
+⸻
 
-Full details and usage examples will be added here soon.
+📄 SmartCandidate Analyzer Documentation
+
+1. Overview
+
+SmartCandidate Analyzer is a Retrieval‑Augmented Generation (RAG) tool for interactive, explainable resume screening. It combines:
+	•	FAISS vector search over hundreds or thousands of resumes
+	•	Sentence‑Transformers embeddings for both resumes and job descriptions
+	•	Reciprocal Rank Fusion to merge multiple sub‑query retrievals
+	•	Local Hugging Face LLMs (e.g. FLAN‑T5, GPT‑2 variants) for concise, human‑readable recommendations
+	•	A Streamlit frontend for instant, no‑API‑key required demo
+
+⸻
+
+2. Key Features
+	1.	Dual Retrieval Modes
+	•	Generic RAG: Single-pass FAISS lookup on the entire job description.
+	•	Fusion RAG: Splits the job description into 3–4 sub‑queries, retrieves each, then fuses via Reciprocal Rank Fusion to improve recall.
+	2.	Match Score for User Uploads
+	•	Drop in your own resume (PDF or TXT).
+	•	Compute and display a cosine‑similarity “Match Score” between your resume and the JD.
+	3.	Explainable Recommendations
+	•	After ranking, the app generates a 2–3 sentence recommendation referencing only “Applicant ID X.”
+	•	No hallucinations: if similarity is below threshold, it warns “No relevant resumes found.”
+	4.	Interview Scheduling Stub
+	•	Select one or more top candidates.
+	•	Pick a date/time and draft an invitation email.
+	•	(Placeholder for real email integration.)
+	5.	Interactive UI
+	•	Sidebar for settings (mode, model choice, resume upload) and persistent documentation.
+	•	Top tabs for “Run” vs “Book Interview.”
+	•	Custom CSS for centered headers, rounded buttons, and metric cards.
+	6.	Fully Local
+	•	No external API keys needed.
+	•	Embeddings and generation happen on your CPU/GPU via open‑source libraries.
+
+⸻
+
+3. Architecture & Data Flow
+
+flowchart LR
+  A[User opens app] --> B[Load CSV & build FAISS index]
+  B --> C[User enters JD + optional upload]
+  C --> D{Help selected?}
+  D -- Instructions / Docs --> Z[Show help text]
+  D -- Otherwise --> E[Run tab]
+  E --> F[Embed JD (SentenceTransformer)]
+  F --> G{Generic or Fusion?}
+  G -- Generic --> H[FAISS search]
+  G -- Fusion --> I[JD → sub‑queries → FAISS per sub] 
+  I --> J[Reciprocal Rank Fusion]
+  H & J --> K[Rank top‑K IDs]
+  K --> L[Display snippets + scores]
+  L --> M[Assemble prompt + call HF pipeline]
+  M --> N[Show recommendation]
+  E --> O[Store last_results in session_state]
+  O --> P[Book Interview tab uses last_results]
+
+
+
+⸻
+
+4. Core Components
+
+4.1 Data Ingestion
+	•	CSV: data/main-data/synthetic-resumes.csv (columns: ID, Resume)
+	•	Embedding:
+
+embedder = SentenceTransformer("all‑MiniLM‑L6‑v2")
+vectors = embedder.encode(df["Resume"].tolist(), convert_to_numpy=True)
+
+
+	•	Indexing:
+
+index = faiss.IndexFlatIP(dim)
+index.add(normalize(vectors))
+
+
+
+4.2 Retrieval
+	•	Generic RAG:
+
+scores, ids = index.search(normalize(embed(JD)), TOP_K)
+
+
+	•	Fusion RAG:
+	1.	Split JD into sentences → sub‑queries
+	2.	Retrieve top K for each
+	3.	Fuse with RRF:
+\text{score}(d) = \sum_{r=1}^K \frac{1}{r + k_\text{offset}}
+	4.	Sort final scores
+
+4.3 Generation
+	•	Prompt template:
+
+You are a hiring consultant. Recommend the single best candidate by Applicant ID, with a 2–3 sentence explanation.
+
+Job Description:
+{JD}
+
+Resumes:
+{ID 123: …}
+{ID 456: …}
+
+Recommendation:
+
+
+	•	Model:
+	•	Instruction‑tuned (e.g. google/flan-t5-large) → text2text-generation
+	•	Smaller (e.g. distilgpt2) → text-generation
+
+4.4 UI & State
+	•	Streamlit caches heavy operations (@st.cache_resource)
+	•	session_state stores last_results and last_jd for interview tab
+	•	Custom CSS to center titles and style widgets
+
+⸻
+
+5. Installation & Deployment
+	1.	Clone the repo and ensure your CSV is in data/main-data/.
+	2.	Create a requirements.txt:
+
+streamlit
+sentence-transformers
+faiss-cpu
+transformers
+pypdf
+scikit-learn
+
+
+	3.	Install:
+
+pip install -r requirements.txt
+
+
+	4.	Run:
+
+streamlit run app.py
+
+
+	5.	(Optional) Deploy to Streamlit Cloud or any container platform.
+
+⸻
+
+6. Next Steps & Extensibility
+	•	Real email: integrate SMTP or SendGrid for “Send Invitations.”
+	•	Batch mode: upload many JDs/resumes at once and export results.
+	•	Chunking & Summarization: pre‑summarize very long resumes to fit larger context windows.
+	•	Model Tuning: swap in GPU‑accelerated models or fine‑tune on your own resume‑JD pairs.
+	•	Logging & Analytics: track which resumes get recommended most often.
+
+⸻
+
+This documentation will evolve as new features are added. Feel free to expand each section with code snippets, architecture diagrams, or usage examples.
 """)
     st.stop()
 
