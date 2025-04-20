@@ -45,7 +45,7 @@ Source job description dataset: [Kaggle](https://www.kaggle.com/datasets/kshitiz
 
 
 **The system's example response when receiving specific applicant IDs**
-[A690D32C-5184-4E20-8D80-375E6A584011!(https://github.com/user-attachments/assets/a5088cde-5f43-4b1e-bbad-0b8e7215f354)
+[A690D32C-5184-4E20-8D80-375E6A584011](https://github.com/user-attachments/assets/a5088cde-5f43-4b1e-bbad-0b8e7215f354)
 
 
 
