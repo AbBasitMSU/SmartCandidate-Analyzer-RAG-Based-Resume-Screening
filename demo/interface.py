@@ -42,7 +42,7 @@ model_choice = st.sidebar.selectbox("🤖 Answer Model", GEN_MODELS, index=GEN_M
 uploaded_pdf = st.sidebar.file_uploader("📄 Upload your resume (PDF/TXT)", type=["pdf","txt"])
 st.sidebar.markdown("---")
 st.sidebar.markdown(
-"""
+
 welcome_message = """
   #### Introduction 🚀
 
@@ -103,7 +103,7 @@ about_message = """
   The program is very much a work in progress. I really appreciate any contribution or feedback on [GitHub](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline).
 
   If you are interested, please do not hesitate to give me a star. 
-"""
+
 """
 )
 st.sidebar.markdown("---")
