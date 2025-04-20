@@ -101,7 +101,7 @@ about_message = """
 
   The program is very much a work in progress. I really appreciate any contribution or feedback on [GitHub](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline).
 
-  If you are interested, please don't hesitate to give me a star. ⭐
+  If you are interested, please do not hesitate to give me a star. 
 """
 """
 )
