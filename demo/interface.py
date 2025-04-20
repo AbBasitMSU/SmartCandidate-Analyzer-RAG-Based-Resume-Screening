@@ -205,7 +205,7 @@ with st.sidebar:
 
         You can change the RAG mode and the GPTs model type using the sidebar options above. 
 
-        About the other parameters such as the generators *temperature* or retrievers *top-K*, I don't want to allow modifying them for the time being to avoid certain problems. 
+        About the other parameters such as the generators *temperature* or retrievers *top-K*, I do not want to allow modifying them for the time being to avoid certain problems. 
         FYI, the temperature is currently set at `0.1` and the top-K is set at `5`.  
 
         ### 3. Is my uploaded data safe? 
@@ -226,12 +226,12 @@ with st.sidebar:
         about_message = """
         # About
 
-        This small program is a prototype designed out of pure interest as additional work for the author's Master's in Data Science project. 
+        This small program is a prototype designed out of pure interest as additional work for the my Masters in Data Science project. 
         The aim of the project is to propose and prove the effectiveness of RAG-based models in resume screening, thus inspiring more research into this field.
 
         The program is very much a work in progress. I really appreciate any contribution or feedback on [GitHub](https://github.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening).
 
-        If you are interested, please don't hesitate to give me a star. 
+        If you are interested, please do not hesitate to give me a star. 
         """
         """
     )
