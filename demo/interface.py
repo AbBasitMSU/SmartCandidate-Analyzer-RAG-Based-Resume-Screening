@@ -234,7 +234,7 @@ with st.sidebar:
         If you are interested, please do not hesitate to give me a star. 
         """
         """
-    )
+      )
 
 
 # ─── CHAT UI ──────────────────────────────────────────────────────────────────
