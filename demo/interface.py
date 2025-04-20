@@ -58,7 +58,7 @@ It uses:
 - **Hugging Face** text‑generation models for recommendations
 
 Source & feedback:  
-https://github.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening  
+[GitHub](https://github.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening)  
 """
 
 # ─── PAGE SETUP ───────────────────────────────────────────────────────────────
