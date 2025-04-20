@@ -52,13 +52,13 @@ welcome_message = """
 
   #### Getting started 🛠️
 
-  1. To set up, please add your OpenAI's API key. 🔑 
-  2. Type in a job description query. 💬
+  1. To set up, please add your OpenAIs API key.  
+  2. Type in a job description query. 
 
   Hint: The knowledge base of the LLM has been loaded with a pre-existing vectorstore of [resumes](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline/blob/main/data/main-data/synthetic-resumes.csv) to be used right away. 
   In addition, you may also find example job descriptions to test [here](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline/blob/main/data/supplementary-data/job_title_des.csv).
 
-  Please make sure to check the sidebar for more useful information. 💡
+  Please make sure to check the sidebar for more useful information. 
 """
 
 info_message = """
@@ -73,16 +73,16 @@ info_message = """
 
   ### 2. What if I want to set my own parameters?
 
-  You can change the RAG mode and the GPT's model type using the sidebar options above. 
+  You can change the RAG mode and the GPTs model type using the sidebar options above. 
 
-  About the other parameters such as the generator's *temperature* or retriever's *top-K*, I don't want to allow modifying them for the time being to avoid certain problems. 
+  About the other parameters such as the generators *temperature* or retrievers *top-K*, I do not want to allow modifying them for the time being to avoid certain problems. 
   FYI, the temperature is currently set at `0.1` and the top-K is set at `5`.  
 
   ### 3. Is my uploaded data safe? 
 
   Your data is not being stored anyhow by the program. Everything is recorded in a Streamlit session state and will be removed once you refresh the app. 
 
-  However, it must be mentioned that the **uploaded data will be processed directly by OpenAI's GPT**, which I do not have control over. 
+  However, it must be mentioned that the **uploaded data will be processed directly by OpenAIs GPT**, which I do not have control over. 
   As such, it is highly recommended to use the default synthetic resumes provided by the program. 
 
   ### 4. How does the chatbot work? 
@@ -96,7 +96,7 @@ info_message = """
 about_message = """
   # About
 
-  This small program is a prototype designed out of pure interest as additional work for the author's Bachelor's thesis project. 
+  This small program is a prototype designed out of pure interest as additional work for the authors Masters Degree project. 
   The aim of the project is to propose and prove the effectiveness of RAG-based models in resume screening, thus inspiring more research into this field.
 
   The program is very much a work in progress. I really appreciate any contribution or feedback on [GitHub](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline).
