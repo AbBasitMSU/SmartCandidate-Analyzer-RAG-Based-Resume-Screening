@@ -50,7 +50,7 @@ uploaded_pdf = st.sidebar.file_uploader("Upload your resume (PDF/TXT)", type=["p
 
 st.sidebar.markdown("---")
 st.sidebar.header("Help")
-help_option = st.sidebar.radio( ["", "Instructions", "Documentation"], index=0)
+help_option = st.sidebar.radio("", [, "Instructions", "Documentation"], index=0)
 st.sidebar.markdown("---")
 st.sidebar.markdown("Built by [AbBasitMSU](https://github.com/AbBasitMSU)")
 
