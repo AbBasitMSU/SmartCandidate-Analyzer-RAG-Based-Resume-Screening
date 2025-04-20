@@ -107,24 +107,26 @@ if "df" not in st.session_state:
 def upload_file():
     # ... your existing checks ...
     if uploaded:
-        # build a fresh embedder only when needed
-        embedder = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-        st.session_state.vectordb = ingest(df_new, "Resume", embedder)
+    
+      embedder = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+      st.session_state.vectordb = ingest(
+        df_load, "Resume", embedder
+    )
     else:
-        # fall back to default vectorstore
-        st.session_state.vectordb = FAISS.load_local(
-            FAISS_PATH,
-            HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL),
-            distance_strategy=DistanceStrategy.COSINE,
-            allow_dangerous_deserialization=True,
-        )
+    # same inline embedder
+      embedder = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+      st.session_state.vectordb = FAISS.load_local(
+        FAISS_PATH, embedder,
+        distance_strategy=DistanceStrategy.COSINE,
+        allow_dangerous_deserialization=True
+      )
 
 if "vectordb" not in st.session_state:
+    embedder = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
     st.session_state.vectordb = FAISS.load_local(
-        FAISS_PATH,
-        st.session_state.embedding_model,
+        FAISS_PATH, embedder,
         distance_strategy=DistanceStrategy.COSINE,
-        allow_dangerous_deserialization=True,
+        allow_dangerous_deserialization=True
     )
 
 # ─── LLM CACHING ───────────────────────────────────────────────────────────────
