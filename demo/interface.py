@@ -8,6 +8,7 @@ from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 from transformers import pipeline
 from sklearn.metrics.pairwise import cosine_similarity
+from datetime import datetime
 
 # ─── CONFIG ─────────────────────────────────────────────────────────────────
 DATA_CSV       = "data/main-data/synthetic-resumes.csv"
@@ -19,51 +20,48 @@ MAX_NEW_TOKENS = 150
 TEMPERATURE    = 0.3
 SIM_THRESHOLD  = 0.2  # minimum cosine similarity to accept
 
-# ─── PAGE THEME & STYLES ─────────────────────────────────────────────────────
+# ─── PAGE THEME & CSS ────────────────────────────────────────────────────────
 st.set_page_config(page_title="SmartCandidate Analyzer", layout="wide")
-st.markdown(
-    """
+st.markdown("""
     <style>
-      /* center title & subtitle */
-      .main-title { text-align: center; font-size: 2.8rem; margin: 0; }
+      /* center header */
+      .main-title { text-align: center; font-size: 2.5rem; margin: 0; }
       .sub-title  { text-align: center; color: #555; margin-top: 0.2rem; margin-bottom: 1rem; }
-      /* tweak buttons and metrics */
+      /* buttons & cards */
       .stButton>button { border-radius: 8px; padding: 0.6em 1.2em; }
       .stMetric > div { background: #ffffffcc; border-radius: 10px; }
       /* page padding */
       .css-1d391kg { padding: 1rem 2rem; }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
-# ─── HEADER with Logo ─────────────────────────────────────────────────────────
-# Try loading your own logo at assets/logo.png, else show a generic emoji
+# ─── HEADER ───────────────────────────────────────────────────────────────────
 logo_path = "assets/logo.png"
 if os.path.exists(logo_path):
     st.image(logo_path, width=120)
 else:
     st.markdown("<h1 class='main-title'>📄</h1>", unsafe_allow_html=True)
-
 st.markdown("<h1 class='main-title'>SmartCandidate Analyzer</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-title'>RAG‑powered resume screening, now with a shiny new UI!</p>",
-            unsafe_allow_html=True)
+st.markdown("<p class='sub-title'>RAG‑powered resume screening, now with a shiny new UI!</p>", unsafe_allow_html=True)
 
-# ─── SIDEBAR CONTROLS ─────────────────────────────────────────────────────────
-mode          = st.sidebar.radio("🔍 Retrieval Mode", ["Generic RAG", "Fusion RAG"])
-model_choice  = st.sidebar.selectbox("🤖 Answer Model", GEN_MODELS, index=GEN_MODELS.index(DEFAULT_GEN))
-uploaded_pdf  = st.sidebar.file_uploader("📄 Upload your resume (PDF/TXT)", type=["pdf", "txt"])
+# ─── SIDEBAR CONTROLS & DOCUMENTATION ─────────────────────────────────────────
+mode         = st.sidebar.radio("🔍 Retrieval Mode", ["Generic RAG", "Fusion RAG"])
+model_choice = st.sidebar.selectbox("🤖 Answer Model", GEN_MODELS, index=GEN_MODELS.index(DEFAULT_GEN))
+uploaded_pdf = st.sidebar.file_uploader("📄 Upload your resume (PDF/TXT)", type=["pdf","txt"])
 st.sidebar.markdown("---")
-st.sidebar.markdown(
-    "**Instructions**  \n"
-    "1. Enter a Job Description.  \n"
-    "2. (Optional) Upload your resume.  \n"
-    "3. Hit **Run** to see match score, ranking, and recommendation."
-)
-st.sidebar.markdown("---")
-st.sidebar.markdown("Built by [AbBasitMSU](https://github.com/AbBasitMSU)")
+st.sidebar.markdown("### Documentation")
+st.sidebar.markdown("""
+**SmartCandidate Analyzer** is a RAG‑powered resume screening demo.  
+- **Embedder**: all‑MiniLM‑L6‑v2  
+- **Retriever**: FAISS (cosine)  
+- **Generator**: Local HF models (e.g. flan‑t5‑large)  
 
-# ─── CACHED LOADERS ───────────────────────────────────────────────────────────
+Use the **Run** tab to enter a JD and see match scores, ranking, and recommendation.  
+Use the **Book Interview** tab to schedule interviews for selected candidates.
+""")
+st.sidebar.markdown("---")
+
+# ─── CACHES ───────────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_data(path):
     df = pd.read_csv(path)
@@ -94,7 +92,7 @@ def get_generator(model_name):
 def extract_text(file) -> str:
     if file.type == "application/pdf":
         reader = PdfReader(io.BytesIO(file.read()))
-        return "\n\n".join(p.extract_text() or "" for p in reader.pages)
+        return "\n\n".join(page.extract_text() or "" for page in reader.pages)
     return file.read().decode("utf-8")
 
 def compute_match_score(jd, resume, emb):
@@ -108,7 +106,7 @@ def retrieve_results(jd, mode, emb, idx):
     if mode == "Generic RAG":
         sc, ids = idx.search(qv, TOP_K)
         return list(zip(ids[0].tolist(), sc[0].tolist()))
-    # Fusion: split into sub‑queries and fuse
+    # Fusion: split into chunks and fuse
     parts = [jd] + jd.split('.')[:4]
     agg = {}
     for chunk in parts:
@@ -116,7 +114,7 @@ def retrieve_results(jd, mode, emb, idx):
         cv /= np.linalg.norm(cv, keepdims=True)
         sc, ids = idx.search(cv, TOP_K)
         for rank, i in enumerate(ids[0]):
-            agg[i] = agg.get(i, 0.0) + 1.0/(rank + 1)
+            agg[i] = agg.get(i, 0.0) + 1.0/(rank+1)
     fused = sorted(agg.items(), key=lambda x: -x[1])[:TOP_K]
     return fused
 
@@ -139,8 +137,8 @@ Recommendation:"""
 df, embedder, idx = load_data(DATA_CSV)
 generator = get_generator(model_choice)
 
-# ─── TOP‐LEVEL TABS ───────────────────────────────────────────────────────────
-tab_run, tab_docs = st.tabs(["🚀 Run", "📄 Documentation"])
+# ─── MAIN TABS ────────────────────────────────────────────────────────────────
+tab_run, tab_book = st.tabs(["🚀 Run", "📅 Book Interview"])
 
 with tab_run:
     st.subheader("📝 Job Description")
@@ -153,12 +151,12 @@ with tab_run:
         st.write(user_text[:200] + "…")
 
     if st.button("Run"):
-        # Sanity: require at least 5 words
+        # sanity check
         if len(jd.split()) < 5:
             st.error("Please enter a more detailed job description (≥ 5 words).")
             st.stop()
 
-        # Metrics row
+        # metrics display
         col1, col2, col3 = st.columns(3)
         if user_text:
             score = compute_match_score(jd, user_text, embedder)
@@ -166,33 +164,38 @@ with tab_run:
         col2.metric("Mode", mode)
         col3.metric("Top K", TOP_K)
 
-        # Retrieve + threshold
+        # retrieve and threshold
         results = retrieve_results(jd, mode, embedder, idx)
         if not results or results[0][1] < SIM_THRESHOLD:
             st.warning("No relevant resumes found for that job description.")
             st.stop()
 
-        # Show Top Resumes & Recommendation
-        result_tab1, result_tab2 = st.tabs(["🔍 Top Resumes", "🤖 Recommendation"])
-        with result_tab1:
-            for rank, (i, sc) in enumerate(results, start=1):
-                st.markdown(f"**{rank}. Applicant ID {df.iloc[i]['ID']}** — Score {sc:.3f}")
-                st.write(df.iloc[i]["Resume"][:200] + "…")
-        with result_tab2:
-            rec = generate_recommendation(jd, [i for i,_ in results], df, generator)
-            st.write(rec)
+        # save for booking
+        st.session_state.last_results = results
+        st.session_state.last_jd = jd
 
-with tab_docs:
-    st.header("Project Documentation")
-    st.markdown(
-        """
-        **SmartCandidate Analyzer** is a Retrieval‑Augmented Generation tool for resume screening.
-        
-        - **Author**: AbBasitMSU  
-        - **Embeddings**: `sentence-transformers/all-MiniLM-L6-v2`  
-        - **Retriever**: FAISS (IP)  
-        - **Generator**: Local HF models (e.g. `flan-t5-large`)  
-        
-        *Full documentation will go here soon.*  
-        """
-    )
+        # show results
+        for rank, (i, sc) in enumerate(results, start=1):
+            st.markdown(f"**{rank}. Applicant ID {df.iloc[i]['ID']}** — Score {sc:.3f}")
+            st.write(df.iloc[i]["Resume"][:200] + "…")
+
+        rec = generate_recommendation(jd, [i for i,_ in results], df, generator)
+        st.subheader("🤖 Recommendation")
+        st.write(rec)
+
+with tab_book:
+    st.subheader("📅 Book Interview")
+    if "last_results" not in st.session_state:
+        st.info("Run a job description first to select candidates.")
+    else:
+        candidates = [f"Applicant ID {df.iloc[i]['ID']}" for i,_ in st.session_state.last_results]
+        selected = st.multiselect("Select candidates", candidates)
+        interview_date = st.date_input("Interview Date", value=datetime.today())
+        interview_time = st.time_input("Interview Time", value=datetime.now().time())
+        email_body = st.text_area(
+            "Email Body",
+            value="Dear Candidate,\n\nWe are pleased to invite you for an interview on {date} at {time}.\n\nBest regards,"
+        )
+        if st.button("Send Invitations"):
+            for cand in selected:
+                st.success(f"Invitation sent to {cand} for {interview_date} at {interview_time}.")
