@@ -25,7 +25,7 @@ On the other hand, RAG Fusion is effective in addressing complex and ambiguous h
 
 ## Demo
 
-The demo interface of the chatbot can be found here: [Streamlit](https://smartcandidate-analyzer.streamlit.app))
+The demo interface of the chatbot can be found here: [Streamlit](https://smartcandidate-analyzer.streamlit.app)
 
 Default synthetic resume data set used in the demo: [GitHub](https://github.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/blob/59c64f32b480bf6ae4ea066c8f0b486ca193d117/data/main-data/synthetic-resumes.csv)
 
@@ -35,7 +35,8 @@ Source job description dataset: [Kaggle](https://www.kaggle.com/datasets/kshitiz
 > The file uploader is still quite unstable in Streamlit deployment. I do not recommend using it.
 
 **Starting screen:**
-![Screenshot_125](https://github.com/Hungreeee/Resume-Screening-RAG-Pipeline/assets/46376260/3a7122d5-1c8e-4d98-bb06-cbc28813a2c3)
+![Screenshot_125]![5F6DD4C0-7EF4-43EC-BA0D-8AD3CB69973F](https://github.com/user-attachments/assets/ed636314-07e6-4bbf-bc51-d440ea4de416)
+
 
 
 **The system's example response when receiving a job description:**
