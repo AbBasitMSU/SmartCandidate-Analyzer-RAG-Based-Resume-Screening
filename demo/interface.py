@@ -69,7 +69,7 @@ info_message = """
   If you want to load in your own resumes file, simply use the uploading button above. 
   Please make sure to have the following column names: `Resume` and `ID`. 
 
-  Keep in mind that the indexing process can take **quite some time** to complete. ⌛
+  Keep in mind that the indexing process can take **quite some time** to complete. 
 
   ### 2. What if I want to set my own parameters?
 
