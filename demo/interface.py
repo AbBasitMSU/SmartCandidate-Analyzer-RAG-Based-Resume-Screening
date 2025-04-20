@@ -45,7 +45,7 @@ st.sidebar.markdown("""
 welcome_message = """
   #### Introduction 🚀
 
-  The system is a RAG pipeline designed to assist hiring managers in searching for the most suitable candidates out of thousands of resumes more effectively. ⚡
+  The system is a RAG pipeline designed to assist hiring managers in searching for the most suitable candidates out of thousands of resumes more effectively. 
 
   The idea is to use a similarity retriever to identify the most suitable applicants with job descriptions.
   This data is then augmented into an LLM generator for downstream tasks such as analysis, summarization, and decision-making. 
