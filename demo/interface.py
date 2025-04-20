@@ -155,6 +155,7 @@ with st.sidebar:
     st.markdown(info_message)
     st.divider()
     st.markdown(about_message)
+    st.markdown("Made by [Ab Basit](https://github.com/AbBasitMSU)")
 
 # ─── RAG / GENERATION HELPERS ──────────────────────────────────────────────────
 def generate_subquestions(question: str) -> list[str]:
