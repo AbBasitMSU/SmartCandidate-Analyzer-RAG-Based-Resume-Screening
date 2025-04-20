@@ -1,3 +1,8 @@
+# >>> PATCH: work around a Bug in sentence‑transformers .to(device) <<<  
+import sentence_transformers  
+# override the `to` method so it becomes a no‑op  
+sentence_transformers.SentenceTransformer.to = lambda self, device: self  
+
 import sys, os
 sys.dont_write_bytecode = True
 
@@ -98,10 +103,21 @@ if "chat_history" not in st.session_state:
 if "df" not in st.session_state:
     st.session_state.df = pd.read_csv(DATA_PATH)
 
-if "embedding_model" not in st.session_state:
-    st.session_state.embedding_model = HuggingFaceEmbeddings(
-        model_name=EMBEDDING_MODEL
-    )
+# Instead, inside upload_file(), when you actually re‑index:
+def upload_file():
+    # ... your existing checks ...
+    if uploaded:
+        # build a fresh embedder only when needed
+        embedder = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+        st.session_state.vectordb = ingest(df_new, "Resume", embedder)
+    else:
+        # fall back to default vectorstore
+        st.session_state.vectordb = FAISS.load_local(
+            FAISS_PATH,
+            HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL),
+            distance_strategy=DistanceStrategy.COSINE,
+            allow_dangerous_deserialization=True,
+        )
 
 if "vectordb" not in st.session_state:
     st.session_state.vectordb = FAISS.load_local(
