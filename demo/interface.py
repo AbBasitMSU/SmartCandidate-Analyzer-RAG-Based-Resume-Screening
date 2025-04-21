@@ -224,8 +224,7 @@ Key Features
                 
 	1.	Two Retrieval Modes
                 
-	•	Generic RAG: Looks at your entire job description in one go and fetches the top matches.
-                
+	•	Generic RAG: Looks at your entire job description in one go and fetches the top matches.       
 	•	Fusion RAG: Breaks the description into smaller sub‑queries, finds matches for each piece, then blends those results together for better coverage.
                 
 	2.	Personal Resume Match
