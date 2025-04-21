@@ -305,12 +305,12 @@ Installation & Deployment
 	1.	Clone the repo, and make sure your CSV of resumes lives at data/main-data/synthetic-resumes.csv.
 	2.	Create a requirements.txt containing:
 
-        streamlit
-        sentence-transformers
-        faiss-cpu
-        transformers
-        pypdf
-        scikit-learn
+            streamlit
+            sentence-transformers
+            faiss-cpu
+            transformers
+            pypdf
+            scikit-learn
 
 
 	3.	Install with:
