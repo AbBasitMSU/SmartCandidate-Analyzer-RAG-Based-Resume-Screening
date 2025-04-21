@@ -140,7 +140,7 @@ elif section == "SmartCandidate tool":
     uploaded = st.sidebar.file_uploader("Upload your resume (PDF/TXT)", type=["pdf", "txt"])
 
     # Centered header
-    st.markdown("<h2 class='centered-header'>🚀 SmartCandidate Tool</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='centered-header'>🚀 Smart Candidate Analysis Tool</h2>", unsafe_allow_html=True)
     st.markdown("<p class='sub-title'>"
                 "RAG‑powered resume screening, now with a shiny new UI!"
                 "</p>", unsafe_allow_html=True)
