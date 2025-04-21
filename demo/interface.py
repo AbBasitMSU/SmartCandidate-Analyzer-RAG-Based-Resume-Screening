@@ -338,4 +338,4 @@ What’s Next & How You Can Extend It
 
 # ─── Built by (always last) ────────────────────────────────────────────────────
 st.sidebar.markdown("---")
-st.sidebar.write("Built with LOVE by [Ab Basit](https://github.com/AbBasitMSU)")
+st.sidebar.write("Built with ❤️ by [Ab Basit](https://github.com/AbBasitMSU)")
