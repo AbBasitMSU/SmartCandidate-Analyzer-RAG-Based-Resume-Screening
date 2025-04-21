@@ -328,6 +328,7 @@ streamlit run interface.py
 ⸻
 
 What’s Next & How You Can Extend It
+                
 	•	Real email integration: hook up SMTP or SendGrid so invites actually go out.
 	•	Batch mode: upload multiple JDs or resumes at once and export a report.
 	•	Resume Summaries: pre-summarize very long resumes so they fit easily.
