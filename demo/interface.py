@@ -127,8 +127,7 @@ elif section == "Instructions":
 # ─── SMARTCANDIDATE TOOL ──────────────────────────────────────────────────────
 elif section == "SmartCandidate tool":
     st.header("🚀 SmartCandidate Tool")
-    st.write("**Generic RAG** does a one‑shot semantic search over your entire JD.  
-**Fusion RAG** splits the JD into sub‑queries, retrieves each, and fuses the results for broader coverage.")
+    st.write("**Generic RAG** does a one‑shot semantic search over your entire JD. /n **Fusion RAG** splits the JD into sub‑queries, retrieves each, and fuses the results for broader coverage.")
     # Controls
     mode         = st.radio("Retrieval Mode", ["Generic RAG", "Fusion RAG"])
     model_choice = st.selectbox("Answer Model", GEN_MODELS, index=GEN_MODELS.index("google/flan-t5-large"))
