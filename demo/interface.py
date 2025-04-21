@@ -28,7 +28,7 @@ st.markdown("""
     .centered-header{ text-align: center; margin-top:0.5rem; margin-bottom:0.5rem; }
     .stButton>button{ border-radius: 8px; padding: 0.6em 1.2em; }
     .[data-testid="stAppViewContainer"] {
-    .background-image: url("https://github.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/blob/1b473209529e4465e87c1c5eeddb12a40df82b20/AC68D056-255F-46BC-86F4-BC3666BC9FBA.png");
+    .background-image: url("https://raw.githubusercontent.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/main/static/AC68D056-255F-46BC-86F4-BC3666BC9FBA.png");
     .background-size: cover;
     .background-position: center;
     .background-repeat: no-repeat;
