@@ -35,17 +35,20 @@ Source job description dataset: [Kaggle](https://www.kaggle.com/datasets/kshitiz
 > The file uploader is still quite unstable in Streamlit deployment. I do not recommend using it.
 
 **Starting screen:**
-[5F6DD4C0-7EF4-43EC-BA0D-8AD3CB69973F](https://github.com/user-attachments/assets/ed636314-07e6-4bbf-bc51-d440ea4de416)
+![FEFDF847-B1ED-46B9-860D-4448DC0582FF](https://github.com/user-attachments/assets/71c504f8-5e62-44a8-ba3e-d639bda0c07f)
+
 
 
 
 **The system's example response when receiving a job description:**
-[9071B18E-3B54-42A9-88F4-CCF089B5A50D](https://github.com/user-attachments/assets/f91c8d19-99d6-4e72-9040-a4fa2370de7c)
+![3B9C70B7-CF02-4FBD-8DF3-AFE2E4A1D3F8](https://github.com/user-attachments/assets/eec1fb59-e77b-4492-976c-882c6e4528fd)
+
 
 
 
 **The system's example response when receiving specific applicant IDs**
-[A690D32C-5184-4E20-8D80-375E6A584011](https://github.com/user-attachments/assets/a5088cde-5f43-4b1e-bbad-0b8e7215f354)
+![EE3C978E-A301-4452-B8CF-A93B17D88148](https://github.com/user-attachments/assets/6ce63659-7855-45e5-950e-8351fd3f3533)
+
 
 
 
