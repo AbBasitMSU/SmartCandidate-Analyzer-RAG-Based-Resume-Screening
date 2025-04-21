@@ -28,12 +28,12 @@ st.markdown("""
   .centered-header{ text-align: center; margin-top:0.5rem; margin-bottom:0.5rem; }
   .stButton>button{ border-radius: 8px; padding: 0.6em 1.2em; }
 
-  /* <<< proper background injection: no leading dots! >>> */
+  /* Full-page background with a 60% white overlay */
   [data-testid="stAppViewContainer"] {
-    background-image: url("https://raw.githubusercontent.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/main/AC68D056-255F-46BC-86F4-BC3666BC9FBA.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background:
+      linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)),
+      url("https://raw.githubusercontent.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/main/AC68D056-255F-46BC-86F4-BC3666BC9FBA.png")
+      center/cover no-repeat;
   }
 </style>
 """, unsafe_allow_html=True)
