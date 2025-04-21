@@ -148,9 +148,9 @@ elif section == "SmartCandidate tool":
     # RAG vs Fusion info (only on main panel)
     st.markdown(
         "<div class='centered-header'>"
-        "**Please Choose 1 of 2 RAG on Side based below info**"
-        "**Generic RAG** is like running one big search on your entire job description at once. It’s fast and gives you solid matches when the JD is straightforward.<br>"
-        "**Fusion RAG** is like breaking your JD into several smaller, focused questions (e.g. “experience,” “skills,” “education”), searching for each of those, and then combining the best results. It takes a bit longer but catches more nuanced fits—great for complex roles with multiple requirements."
+        "### **Please Choose 1 of 2 RAG on Side based below info**<br>"
+        "### **Generic RAG** is like running one big search on your entire job description at once. It’s fast and gives you solid matches when the JD is straightforward.<br>"
+        "### **Fusion RAG** is like breaking your JD into several smaller, focused questions (e.g. “experience,” “skills,” “education”), searching for each of those, and then combining the best results. It takes a bit longer but catches more nuanced fits—great for complex roles with multiple requirements."
         "</div>",
         unsafe_allow_html=True,
     )
