@@ -211,7 +211,9 @@ Below is a rich, detailed Documentation write‑up you can paste straight into y
 Introduction
 
 “SmartCandidate Analyzer” is a tool that helps you find the best job applicants from a big pile of resumes. Instead of just matching keywords (which can miss important details), it uses a two‑step “retrieve & generate” approach:
+                
 	1.	Retrieve the most relevant resumes by turning both job descriptions and resumes into math‑friendly vectors and comparing them.
+                
 	2.	Generate a short, human‑readable recommendation explaining which resume seems best and why.
 
 All of this runs right in your browser with Streamlit—no API keys or fancy setup needed.
