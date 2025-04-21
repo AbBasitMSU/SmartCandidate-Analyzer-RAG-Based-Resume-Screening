@@ -133,6 +133,9 @@ elif section == "SmartCandidate tool":
 
     # Centered header
     st.markdown("<h2 class='centered-header'>🚀 SmartCandidate Tool</h2>", unsafe_allow_html=True)
+    st.markdown("<p class='sub-title'>"
+                "RAG‑powered resume screening, now with a shiny new UI!"
+                "</p>", unsafe_allow_html=True)
 
     # RAG vs Fusion info (only on main panel)
     st.markdown(
