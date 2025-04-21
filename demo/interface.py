@@ -208,126 +208,79 @@ Below is a rich, detailed Documentation write‑up you can paste straight into y
 
 ⸻
 
-📄 SmartCandidate Analyzer Documentation
+Introduction
 
-1. Overview
+“SmartCandidate Analyzer” is a tool that helps you find the best job applicants from a big pile of resumes. Instead of just matching keywords (which can miss important details), it uses a two‑step “retrieve & generate” approach:
+	1.	Retrieve the most relevant resumes by turning both job descriptions and resumes into math‑friendly vectors and comparing them.
+	2.	Generate a short, human‑readable recommendation explaining which resume seems best and why.
 
-SmartCandidate Analyzer is a Retrieval‑Augmented Generation (RAG) tool for interactive, explainable resume screening. It combines:
-    •   FAISS vector search over hundreds or thousands of resumes
-    •   Sentence‑Transformers embeddings for both resumes and job descriptions
-    •   Reciprocal Rank Fusion to merge multiple sub‑query retrievals
-    •   Local Hugging Face LLMs (e.g. FLAN‑T5, GPT‑2 variants) for concise, human‑readable recommendations
-    •   A Streamlit frontend for instant, no‑API‑key required demo
+All of this runs right in your browser with Streamlit—no API keys or fancy setup needed.
 
 ⸻
 
-2. Key Features
-    1.  Dual Retrieval Modes
-    •   Generic RAG: Single-pass FAISS lookup on the entire job description.
-    •   Fusion RAG: Splits the job description into 3–4 sub‑queries, retrieves each, then fuses via Reciprocal Rank Fusion to improve recall.
-    2.  Match Score for User Uploads
-    •   Drop in your own resume (PDF or TXT).
-    •   Compute and display a cosine‑similarity “Match Score” between your resume and the JD.
-    3.  Explainable Recommendations
-    •   After ranking, the app generates a 2–3 sentence recommendation referencing only “Applicant ID X.”
-    •   No hallucinations: if similarity is below threshold, it warns “No relevant resumes found.”
-    4.  Interview Scheduling Stub
-    •   Select one or more top candidates.
-    •   Pick a date/time and draft an invitation email.
-    •   (Placeholder for real email integration.)
-    5.  Interactive UI
-    •   Sidebar for settings (mode, model choice, resume upload) and persistent documentation.
-    •   Top tabs for “Run” vs “Book Interview.”
-    •   Custom CSS for centered headers, rounded buttons, and metric cards.
-    6.  Fully Local
-    •   No external API keys needed.
-    •   Embeddings and generation happen on your CPU/GPU via open‑source libraries.
+Key Features
+	1.	Two Retrieval Modes
+	•	Generic RAG: Looks at your entire job description in one go and fetches the top matches.
+	•	Fusion RAG: Breaks the description into smaller sub‑queries, finds matches for each piece, then blends those results together for better coverage.
+	2.	Personal Resume Match
+	•	You can upload your own resume (PDF or TXT).
+	•	The app will compute and show you a “match score” (like 87%) between your resume and the job description.
+	3.	Explainable Recommendations
+	•	After ranking, it writes a 2–3 sentence summary saying something like, “Applicant ID 123 is the best fit because…”
+	•	If nothing matches well, it warns you instead of guessing.
+	4.	Interview Scheduling (Stub)
+	•	Pick one or more top candidates from the results.
+	•	Choose a date/time and draft an email invitation.
+	•	(Email integration is a placeholder for now.)
+	5.	Interactive and Local
+	•	All settings live in a sidebar: choose your RAG mode, pick an answer model (e.g. Flan‑T5), upload resumes, and view documentation.
+	•	The main area has two tabs: Run (fetch and judge resumes) and Book Interview (schedule invites).
+	•	Everything runs on your machine—no external API calls.
 
 ⸻
 
-3. Architecture & Data Flow
-
-flowchart LR
-  A[User opens app] --> B[Load CSV & build FAISS index]
-  B --> C[User enters JD + optional upload]
-  C --> D{Help selected?}
-  D -- Instructions / Docs --> Z[Show help text]
-  D -- Otherwise --> E[Run tab]
-  E --> F[Embed JD (SentenceTransformer)]
-  F --> G{Generic or Fusion?}
-  G -- Generic --> H[FAISS search]
-  G -- Fusion --> I[JD → sub‑queries → FAISS per sub] 
-  I --> J[Reciprocal Rank Fusion]
-  H & J --> K[Rank top‑K IDs]
-  K --> L[Display snippets + scores]
-  L --> M[Assemble prompt + call HF pipeline]
-  M --> N[Show recommendation]
-  E --> O[Store last_results in session_state]
-  O --> P[Book Interview tab uses last_results]
-
-
+How It Works (High‑Level Flow)
+	1.	User opens the app.
+	2.	Data loads from a CSV of resumes and an embedding model builds an index in FAISS.
+	3.	User enters a job description (and optional resume).
+	4.	If they asked for help (Instructions or Documentation), that appears. Otherwise we go into the Run tab:
+	•	The text is embedded via Sentence‑Transformers.
+	•	Generic vs Fusion logic picks top “K” candidates.
+	•	We show snippets of each resume and their similarity scores.
+	•	We build a final prompt combining the job description + those snippets
+	•	We feed that to a Hugging Face model (e.g. Flan‑T5) that writes the recommendation.
+	5.	Results (top candidates + a short recommendation) appear on screen.
+	6.	Book Interview tab can then use those stored results to let you pick candidates and send invites.
 
 ⸻
 
-4. Core Components
-
-4.1 Data Ingestion
-    •   CSV: data/main-data/synthetic-resumes.csv (columns: ID, Resume)
-    •   Embedding:
-
-embedder = SentenceTransformer("all‑MiniLM‑L6‑v2")
-vectors = embedder.encode(df["Resume"].tolist(), convert_to_numpy=True)
-
-
-    •   Indexing:
-
-index = faiss.IndexFlatIP(dim)
-index.add(normalize(vectors))
-
-
-
-4.2 Retrieval
-    •   Generic RAG:
-
-scores, ids = index.search(normalize(embed(JD)), TOP_K)
-
-
-    •   Fusion RAG:
-    1.  Split JD into sentences → sub‑queries
-    2.  Retrieve top K for each
-    3.  Fuse with RRF:
-\text{score}(d) = \sum_{r=1}^K \frac{1}{r + k_\text{offset}}
-    4.  Sort final scores
-
-4.3 Generation
-    •   Prompt template:
-
-You are a hiring consultant. Recommend the single best candidate by Applicant ID, with a 2–3 sentence explanation.
-
-Job Description:
-{JD}
-
-Resumes:
-{ID 123: …}
-{ID 456: …}
-
+The Pieces Behind the Scenes
+	•	Data Ingestion
+	•	Resumes are kept in a simple CSV file with two columns: ID and Resume.
+	•	We load that into a pandas DataFrame.
+	•	Embeddings & Indexing
+	•	We use the all‑MiniLM‑L6‑v2 Sentence‑Transformers model to turn each resume into a numeric vector.
+	•	Those vectors go into a FAISS index for super-fast similarity lookups.
+	•	Retrieval
+	•	Generic RAG: one vector lookup on the full job description.
+	•	Fusion RAG: split the job description into 3–4 chunks, do separate lookups, then combine their ranks (via “Reciprocal Rank Fusion”) into a final list.
+	•	Generation
+	•	We craft a prompt like:
+You are a hiring consultant. Recommend the single best candidate by Applicant ID…
+Job Description: …
+Resumes: ID 123: …
 Recommendation:
-
-
-    •   Model:
-    •   Instruction‑tuned (e.g. google/flan-t5-large) → text2text-generation
-    •   Smaller (e.g. distilgpt2) → text-generation
-
-4.4 UI & State
-    •   Streamlit caches heavy operations (@st.cache_resource)
-    •   session_state stores last_results and last_jd for interview tab
-    •   Custom CSS to center titles and style widgets
+	•	Then we call a local Hugging Face model (text‑generation or text2text‐generation, depending on whether it’s Flan‑T5 or GPT‑2) to write that final explanation.
+	•	User Interface
+	•	Streamlit’s @st.cache_resource ensures we only build the FAISS index once per session.
+	•	st.session_state keeps the last results around so the Book Interview tab can use them.
+	•	A bit of custom CSS centers titles, rounds button corners, and generally polishes the look.
 
 ⸻
 
-5. Installation & Deployment
-    1.  Clone the repo and ensure your CSV is in data/main-data/.
-    2.  Create a requirements.txt:
+Installation & Deployment
+	1.	Clone the repo, and make sure your CSV of resumes lives at data/main-data/synthetic-resumes.csv.
+	2.	Create a requirements.txt containing:
 
 streamlit
 sentence-transformers
@@ -337,30 +290,26 @@ pypdf
 scikit-learn
 
 
-    3.  Install:
+	3.	Install with:
 
 pip install -r requirements.txt
 
 
-    4.  Run:
+	4.	Run your app:
 
-streamlit run app.py
+streamlit run interface.py
 
 
-    5.  (Optional) Deploy to Streamlit Cloud or any container platform.
-
-⸻
-
-6. Next Steps & Extensibility
-    •   Real email: integrate SMTP or SendGrid for “Send Invitations.”
-    •   Batch mode: upload many JDs/resumes at once and export results.
-    •   Chunking & Summarization: pre‑summarize very long resumes to fit larger context windows.
-    •   Model Tuning: swap in GPU‑accelerated models or fine‑tune on your own resume‑JD pairs.
-    •   Logging & Analytics: track which resumes get recommended most often.
+	5.	(Optional) Deploy on Streamlit Cloud or any container platform.
 
 ⸻
 
-This documentation will evolve as new features are added. Feel free to expand each section with code snippets, architecture diagrams, or usage examples.
+What’s Next & How You Can Extend It
+	•	Real email integration: hook up SMTP or SendGrid so invites actually go out.
+	•	Batch mode: upload multiple JDs or resumes at once and export a report.
+	•	Resume Summaries: pre-summarize very long resumes so they fit easily.
+	•	Model Tuning: swap in GPU‑accelerated models or fine‑tune on your own data.
+	•	Analytics & Logging: track which candidates get chosen most often, measure pipeline performance, and so on.
 """)
 
 # ─── Built by (always last) ────────────────────────────────────────────────────
