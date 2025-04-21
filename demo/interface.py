@@ -22,18 +22,20 @@ SIM_THRESHOLD  = 0.2
 # ─── PAGE SETUP & CSS ─────────────────────────────────────────────────────────
 st.set_page_config(page_title="SmartCandidate Analyzer", layout="wide")
 st.markdown("""
-  <style>
-    .main-title     { text-align: center; font-size: 2.5rem; margin: 0; }
-    .sub-title      { text-align: center; color: #555; margin-top:0.2rem; margin-bottom:1rem; }
-    .centered-header{ text-align: center; margin-top:0.5rem; margin-bottom:0.5rem; }
-    .stButton>button{ border-radius: 8px; padding: 0.6em 1.2em; }
-    .[data-testid="stAppViewContainer"] {
-    .background-image: url("https://raw.githubusercontent.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/main/static/AC68D056-255F-46BC-86F4-BC3666BC9FBA.png");
-    .background-size: cover;
-    .background-position: center;
-    .background-repeat: no-repeat;
-    }
-  </style>
+<style>
+  .main-title     { text-align: center; font-size: 2.5rem; margin: 0; }
+  .sub-title      { text-align: center; color: #555; margin-top:0.2rem; margin-bottom:1rem; }
+  .centered-header{ text-align: center; margin-top:0.5rem; margin-bottom:0.5rem; }
+  .stButton>button{ border-radius: 8px; padding: 0.6em 1.2em; }
+
+  /* <<< proper background injection: no leading dots! >>> */
+  [data-testid="stAppViewContainer"] {
+    background-image: url("https://raw.githubusercontent.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/main/static/AC68D056-255F-46BC-86F4-BC3666BC9FBA.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+</style>
 """, unsafe_allow_html=True)
 
 # ─── HELPERS & CACHES ──────────────────────────────────────────────────────────
