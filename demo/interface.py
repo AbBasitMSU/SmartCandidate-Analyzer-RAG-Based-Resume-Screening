@@ -229,21 +229,22 @@ Key Features
                 
 	2.	Personal Resume Match
                 
-	•	You can upload your own resume (PDF or TXT).
-                
+	•	You can upload your own resume (PDF or TXT).          
 	•	The app will compute and show you a “match score” (like 87%) between your resume and the job description.
                 
 	3.	Explainable Recommendations
                 
-	•	After ranking, it writes a 2–3 sentence summary saying something like, “Applicant ID 123 is the best fit because…”
-                
+	•	After ranking, it writes a 2–3 sentence summary saying something like, “Applicant ID 123 is the best fit because…”            
 	•	If nothing matches well, it warns you instead of guessing.
                 
 	4.	Interview Scheduling (Stub)
+                
 	•	Pick one or more top candidates from the results.
 	•	Choose a date/time and draft an email invitation.
 	•	(Email integration is a placeholder for now.)
+                
 	5.	Interactive and Local
+                
 	•	All settings live in a sidebar: choose your RAG mode, pick an answer model (e.g. Flan‑T5), upload resumes, and view documentation.
 	•	The main area has two tabs: Run (fetch and judge resumes) and Book Interview (schedule invites).
 	•	Everything runs on your machine—no external API calls.
@@ -251,21 +252,29 @@ Key Features
 ⸻
 
 How It Works (High‑Level Flow)
+                
 	1.	User opens the app.
+                
 	2.	Data loads from a CSV of resumes and an embedding model builds an index in FAISS.
+                
 	3.	User enters a job description (and optional resume).
+                
 	4.	If they asked for help (Instructions or Documentation), that appears. Otherwise we go into the Run tab:
+                
 	•	The text is embedded via Sentence‑Transformers.
 	•	Generic vs Fusion logic picks top “K” candidates.
 	•	We show snippets of each resume and their similarity scores.
 	•	We build a final prompt combining the job description + those snippets
 	•	We feed that to a Hugging Face model (e.g. Flan‑T5) that writes the recommendation.
+                
 	5.	Results (top candidates + a short recommendation) appear on screen.
+                
 	6.	Book Interview tab can then use those stored results to let you pick candidates and send invites.
 
 ⸻
 
 The Pieces Behind the Scenes
+                
 	•	Data Ingestion
 	•	Resumes are kept in a simple CSV file with two columns: ID and Resume.
 	•	We load that into a pandas DataFrame.
@@ -276,11 +285,15 @@ The Pieces Behind the Scenes
 	•	Generic RAG: one vector lookup on the full job description.
 	•	Fusion RAG: split the job description into 3–4 chunks, do separate lookups, then combine their ranks (via “Reciprocal Rank Fusion”) into a final list.
 	•	Generation
+                
 	•	We craft a prompt like:
+                
 You are a hiring consultant. Recommend the single best candidate by Applicant ID…
 Job Description: …
 Resumes: ID 123: …
+                
 Recommendation:
+                
 	•	Then we call a local Hugging Face model (text‑generation or text2text‐generation, depending on whether it’s Flan‑T5 or GPT‑2) to write that final explanation.
 	•	User Interface
 	•	Streamlit’s @st.cache_resource ensures we only build the FAISS index once per session.
