@@ -30,7 +30,7 @@ st.markdown("""
 
   /* <<< proper background injection: no leading dots! >>> */
   [data-testid="stAppViewContainer"] {
-    background-image: url("https://raw.githubusercontent.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/main/static/AC68D056-255F-46BC-86F4-BC3666BC9FBA.png");
+    background-image: url("https://raw.githubusercontent.com/AbBasitMSU/SmartCandidate-Analyzer-RAG-Based-Resume-Screening/main/AC68D056-255F-46BC-86F4-BC3666BC9FBA.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
