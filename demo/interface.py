@@ -23,33 +23,36 @@ SIM_THRESHOLD  = 0.2
 st.set_page_config(page_title="SmartCandidate Analyzer", layout="wide")
 st.markdown("""
   <style>
-    .main-title { text-align: center; font-size: 2.5rem; margin: 0; }
-    .sub-title  { text-align: center; color: #555; margin-top:0.2rem; margin-bottom:1rem; }
-    .centered-header { text-align: center; }
-    .stButton>button { border-radius: 8px; padding: 0.6em 1.2em; }
+    .main-title     { text-align: center; font-size: 2.5rem; margin: 0; }
+    .sub-title      { text-align: center; color: #555; margin-top:0.2rem; margin-bottom:1rem; }
+    .centered-header{ text-align: center; margin-top:0.5rem; margin-bottom:0.5rem; }
+    .stButton>button{ border-radius: 8px; padding: 0.6em 1.2em; }
   </style>
 """, unsafe_allow_html=True)
 
 # ─── HELPERS & CACHES ──────────────────────────────────────────────────────────
 @st.cache_resource
 def load_data(path):
-    df = pd.read_csv(path); df["ID"] = df["ID"].astype(str)
+    df = pd.read_csv(path)
+    df["ID"] = df["ID"].astype(str)
     embedder = SentenceTransformer(EMBED_MODEL)
     embs = embedder.encode(df["Resume"].tolist(), convert_to_numpy=True)
     embs /= np.linalg.norm(embs, axis=1, keepdims=True)
-    idx = faiss.IndexFlatIP(embs.shape[1]); idx.add(embs)
+    idx = faiss.IndexFlatIP(embs.shape[1])
+    idx.add(embs)
     return df, embedder, idx
 
 @st.cache_resource
 def get_generator(model_name):
     task = "text2text-generation" if "flan" in model_name else "text-generation"
     gen = pipeline(
-        task, model=model_name,
+        task,
+        model=model_name,
         max_new_tokens=MAX_NEW_TOKENS,
         temperature=TEMPERATURE,
         truncation=True,
         pad_token_id=None,
-        device=-1
+        device=-1,
     )
     gen.tokenizer.pad_token_id = gen.tokenizer.eos_token_id
     return gen
@@ -67,19 +70,20 @@ def compute_match_score(jd, resume, emb):
 
 def retrieve_results(jd, mode, emb, idx):
     qv = emb.encode([jd], convert_to_numpy=True); qv /= np.linalg.norm(qv, keepdims=True)
-    if mode=="Generic RAG":
+    if mode == "Generic RAG":
         sc, ids = idx.search(qv, TOP_K)
         return list(zip(ids[0].tolist(), sc[0].tolist()))
-    parts, agg = [jd]+jd.split('.')[:4], {}
+    parts, agg = [jd] + jd.split('.')[:4], {}
     for p in parts:
         cv = emb.encode([p], convert_to_numpy=True); cv /= np.linalg.norm(cv, keepdims=True)
         sc, ids = idx.search(cv, TOP_K)
-        for rank,i in enumerate(ids[0]):
-            agg[i] = agg.get(i,0) + 1/(rank+1)
-    return sorted(agg.items(), key=lambda x:-x[1])[:TOP_K]
+        for rank, i in enumerate(ids[0]):
+            agg[i] = agg.get(i, 0) + 1/(rank + 1)
+    return sorted(agg.items(), key=lambda x: -x[1])[:TOP_K]
 
 def generate_recommendation(jd, ids, df, gen):
-    ctx = "\n\n".join(f"ID {df.iloc[i]['ID']}:\n{df.iloc[i]['Resume'][:200]}…" for i in ids)
+    ctx = "\n\n".join(f"ID {df.iloc[i]['ID']}:\n{df.iloc[i]['Resume'][:200]}…"
+                      for i in ids)
     prompt = f"""You are a hiring consultant.
 Recommend the single best candidate by Applicant ID, with a 2–3 sentence explanation.
 
@@ -99,65 +103,56 @@ section = st.sidebar.radio("Select a Section",
     ["Home", "Instructions", "SmartCandidate tool", "Documentation"])
 st.sidebar.markdown("---")
 
-# (Sidebar content for SmartCandidate tool will go here…)
-
-# ─── HOME ──────────────────────────────────────────────────────────────────────
+# Home & Instructions are unchanged…
 if section == "Home":
-    st.markdown("<h1 class='main-title'>SmartCandidate Analyzer</h1>",
-                unsafe_allow_html=True)
+    st.markdown("<h1 class='main-title'>SmartCandidate Analyzer</h1>", unsafe_allow_html=True)
     st.markdown("<p class='sub-title'>"
                 "RAG‑powered resume screening, now with a shiny new UI!"
                 "</p>", unsafe_allow_html=True)
 
-# ─── INSTRUCTIONS ─────────────────────────────────────────────────────────────
 elif section == "Instructions":
     st.header("🛠 How to Use SmartCandidate Analyzer")
     st.markdown("""
-1. Enter a clear Job Description (at least 5 words).  
+1. Enter a Job Description (≥ 5 words).  
 2. (Optional) Upload your resume (PDF/TXT) to compute a match score.  
-3. Click **Run** in the SmartCandidate tool to retrieve, rank, and get a recommendation.  
-4. Switch to **Book Interview** to select top candidates and send invites.
+3. Go to **SmartCandidate tool** and click **Run**.  
+4. Then switch to **Book Interview** to send invites.
 """)
 
 # ─── SMARTCANDIDATE TOOL ──────────────────────────────────────────────────────
 elif section == "SmartCandidate tool":
-    # Lazy‑load data & embeddings
+    # Lazy‑load the heavy parts
     df, embedder, idx = load_data(DATA_CSV)
 
     # Sidebar controls
     st.sidebar.markdown("### Retrieval Mode")
     mode = st.sidebar.radio("", ["Generic RAG", "Fusion RAG"])
     st.sidebar.markdown("### Answer Model")
-    model_choice = st.sidebar.selectbox("", GEN_MODELS,
-                                        index=GEN_MODELS.index(DEFAULT_GEN))
-    uploaded = st.sidebar.file_uploader("Upload your resume (PDF/TXT)",
-                                        type=["pdf", "txt"])
-    st.sidebar.markdown("---")
-    st.sidebar.markdown(
-        "• **Generic RAG**: one-shot semantic search on full JD.  \n"
-        "• **Fusion RAG**: splits JD into sub-queries and fuses results."
+    model_choice = st.sidebar.selectbox("", GEN_MODELS, index=GEN_MODELS.index(DEFAULT_GEN))
+    uploaded = st.sidebar.file_uploader("Upload your resume (PDF/TXT)", type=["pdf", "txt"])
+
+    # Centered header
+    st.markdown("<h2 class='centered-header'>🚀 SmartCandidate Tool</h2>", unsafe_allow_html=True)
+
+    # RAG vs Fusion info (only on main panel)
+    st.markdown(
+        "<div class='centered-header'>"
+        "**Generic RAG** does a one‑shot semantic search over your full JD.<br>"
+        "**Fusion RAG** splits the JD into focused sub‑queries and fuses their results."
+        "</div>",
+        unsafe_allow_html=True,
     )
 
-    # Main panel: centered header + tabs
-    st.markdown("<h2 class='centered-header'>🚀 SmartCandidate Tool</h2>",
-                unsafe_allow_html=True)
+    # Top‑level tabs
     tab_run, tab_book = st.tabs(["🚀 Run", "📅 Book Interview"])
 
     with tab_run:
-        # Description on main panel
-        st.markdown(
-            "<div class='centered-header'>"
-            "Generic RAG does a single-pass search on your full JD.<br>"
-            "Fusion RAG splits the JD into focused sub‑queries and fuses their results."
-            "</div>",
-            unsafe_allow_html=True,
-        )
-
         jd = st.text_area("📄 Job Description", height=150)
         if st.button("Run"):
             if len(jd.split()) < 5:
                 st.error("Please enter at least 5 words."); st.stop()
 
+            # Optional resume match
             user_text = extract_text(uploaded) if uploaded else None
             c1, c2, c3 = st.columns(3)
             if user_text:
@@ -165,20 +160,24 @@ elif section == "SmartCandidate tool":
                 c1.metric("Your Resume Match", f"{score*100:.1f}%")
             c2.metric("Mode", mode); c3.metric("Top K", TOP_K)
 
+            # Retrieval + threshold
             results = retrieve_results(jd, mode, embedder, idx)
             if not results or results[0][1] < SIM_THRESHOLD:
                 st.warning("No relevant resumes found."); st.stop()
 
+            # Store for booking
             st.session_state.last_results = results
             st.session_state.last_jd      = jd
 
+            # Show candidates
             st.subheader("🔍 Top Candidates")
             for rank, (i, sc) in enumerate(results, start=1):
-                st.markdown(f"**{rank}. Applicant ID {df.iloc[i]['ID']}** — Score {sc:.3f}")
+                st.markdown(f"**{rank}. Applicant ID {df.iloc[i]['ID']}** — Score {sc:.3f}")
                 st.write(df.iloc[i]["Resume"][:200] + "…")
 
+            # Recommendation
             gen = get_generator(model_choice)
-            rec = generate_recommendation(jd, [i for i,_ in results], df, gen)
+            rec = generate_recommendation(jd, [i for i, _ in results], df, gen)
             st.subheader("🤖 Recommendation"); st.write(rec)
 
     with tab_book:
@@ -191,27 +190,28 @@ elif section == "SmartCandidate tool":
             chosen = st.multiselect("Select candidates", labels)
             interview_date = st.date_input("Interview Date", datetime.today())
             interview_time = st.time_input("Interview Time", datetime.now().time())
-            email_body = st.text_area("Email Body",
-                value=f"Dear Candidate,\n\nWe invite you on {interview_date} at {interview_time}.\n")
+            email_body = st.text_area(
+                "Email Body",
+                value=f"Dear Candidate,\n\nWe invite you on {interview_date} at {interview_time}.\n"
+            )
             if st.button("Send Invitations"):
                 for cand in chosen:
                     st.success(f"Invitation sent to {cand}.")
 
-# ─── DOCUMENTATION ────────────────────────────────────────────────────────────
 elif section == "Documentation":
     st.header("📄 Documentation")
     st.markdown("""
-*(Paste your full project documentation here…)*
+*(Your full project documentation goes here…)*
 
 **Overview**  
-SmartCandidate Analyzer is a Retrieval‑Augmented Generation tool for interactive, explainable resume screening.  
-- **Embeddings**: `all‑MiniLM‑L6‑v2` + FAISS  
+SmartCandidate Analyzer is a Retrieval‑Augmented Generation tool for resume screening.
+- **Embeddings**: all‑MiniLM‑L6‑v2 + FAISS  
 - **Retrieval**: Generic & Fusion RAG  
-- **Generation**: Local HF Models (e.g. `flan‑t5‑large`)  
-- **UI**: Streamlit with Run & Book Interview  
-- **Local**: No external API keys needed  
-    """)
+- **Generation**: Local Hugging Face models  
+- **UI**: Streamlit with Run & Book Interview tabs  
+- **Local**: No API keys needed  
+""")
 
-# ─── ALWAYS AT BOTTOM OF SIDEBAR ────────────────────────────────────────────────
+# ─── Built by (always last) ────────────────────────────────────────────────────
 st.sidebar.markdown("---")
 st.sidebar.write("Built with LOVE by [Ab Basit](https://github.com/AbBasitMSU)")
