@@ -221,15 +221,25 @@ All of this runs right in your browser with Streamlit—no API keys or fancy set
 ⸻
 
 Key Features
+                
 	1.	Two Retrieval Modes
+                
 	•	Generic RAG: Looks at your entire job description in one go and fetches the top matches.
+                
 	•	Fusion RAG: Breaks the description into smaller sub‑queries, finds matches for each piece, then blends those results together for better coverage.
+                
 	2.	Personal Resume Match
+                
 	•	You can upload your own resume (PDF or TXT).
+                
 	•	The app will compute and show you a “match score” (like 87%) between your resume and the job description.
+                
 	3.	Explainable Recommendations
+                
 	•	After ranking, it writes a 2–3 sentence summary saying something like, “Applicant ID 123 is the best fit because…”
+                
 	•	If nothing matches well, it warns you instead of guessing.
+                
 	4.	Interview Scheduling (Stub)
 	•	Pick one or more top candidates from the results.
 	•	Choose a date/time and draft an email invitation.
