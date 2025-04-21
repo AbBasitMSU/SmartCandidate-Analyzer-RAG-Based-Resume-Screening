@@ -284,10 +284,8 @@ The Pieces Behind the Scenes
 	•	Retrieval
 	•	Generic RAG: one vector lookup on the full job description.
 	•	Fusion RAG: split the job description into 3–4 chunks, do separate lookups, then combine their ranks (via “Reciprocal Rank Fusion”) into a final list.
-	•	Generation
-                
-	•	We craft a prompt like:
-                
+	•	Generation                
+	•	We craft a prompt like:                
 You are a hiring consultant. Recommend the single best candidate by Applicant ID…
 Job Description: …
 Resumes: ID 123: …
@@ -303,15 +301,16 @@ Recommendation:
 ⸻
 
 Installation & Deployment
+                
 	1.	Clone the repo, and make sure your CSV of resumes lives at data/main-data/synthetic-resumes.csv.
 	2.	Create a requirements.txt containing:
 
-streamlit
-sentence-transformers
-faiss-cpu
-transformers
-pypdf
-scikit-learn
+        streamlit
+        sentence-transformers
+        faiss-cpu
+        transformers
+        pypdf
+        scikit-learn
 
 
 	3.	Install with:
